@@ -1,38 +1,45 @@
-name: Release Next Branch
+name: Release
 
 on:
   push:
     tags:
-      - '0.*' # 监听以 v 开头的标签推送（例如 v1.0.0）
+      - '0.*' # Push events to matching
 
 jobs:
-  merge-next-to-main:
+  release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # 需要写权限执行合并操作
+      contents: write
+      id-token: write
 
     steps:
-      - name: 检出代码
+      - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
-          fetch-depth: 0 # 获取所有历史记录和分支
+          node-version-file: '.node-version'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
 
-      - name: 配置 Git 用户
+      - name: Install deps
+        run: pnpm install
+
+      - name: Build and publish
+        id: publish
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-
-      - name: 合并 next 分支到 main
-        run: |
-          # 切换到 main 分支
-          git checkout main
-
-          # 尝试合并 next 分支（使用 --no-ff 保留合并记录）
-          git merge --no-ff -m "Merge next into main (Automated by GitHub Actions)" origin/next
-
-          # 推送到远程仓库
-          git push origin main
-
+          pnpm release --publishOnly
         env:
-          # 使用 GitHub Token 进行身份验证
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub release
+        id: release_tag
+        uses: ChenXiaohui99
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
