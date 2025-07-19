@@ -36,11 +36,3 @@ jobs:
         env:
           # 使用 GitHub Token 进行身份验证
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create GitHub release
-        id: release_tag
-        uses: ChenXiaohui99
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
