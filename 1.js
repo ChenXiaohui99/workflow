@@ -8,3 +8,5 @@ const completeList = () => {
     })
     .join(',');
 };
+
+const whisper = 1000;
