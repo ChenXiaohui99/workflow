@@ -6,7 +6,7 @@ on:
       - '0.*' # 监听以 v 开头的标签推送（例如 v1.0.0）
 
 jobs:
-  merge-next-to-main:
+  merge-next-to-master:
     runs-on: ubuntu-latest
     permissions:
       contents: write # 需要写权限执行合并操作
